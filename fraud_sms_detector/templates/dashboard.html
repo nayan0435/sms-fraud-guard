@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Dashboard - SMS Fraud Guard</title>
+    <meta name="description" content="Security team dashboard for monitoring SMS fraud alerts and blocked messages">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="dashboard-page">
+    <!-- Header -->
+    <header class="header dashboard-header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔒</div>
+                <div>
+                    <h1>Security Dashboard</h1>
+                    <span class="tagline">Spam Security Team Portal</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="live-indicator">
+                    <span class="live-dot"></span>
+                    LIVE
+                </span>
+                <a href="/" class="btn btn-outline">📱 User App</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card alert-card">
+                <div class="stat-icon alert-icon">⚠️</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="pendingAlerts">0</span>
+                    <span class="stat-label">Pending Alerts</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon scan-icon">📱</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalScanned">0</span>
+                    <span class="stat-label">Total Scanned</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon fraud-icon">🚨</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="fraudDetected">0</span>
+                    <span class="stat-label">Fraud Detected</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon block-icon">🚫</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="blockedCount">0</span>
+                    <span class="stat-label">Blocked</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alerts Table -->
+    <main class="main-content dashboard-main">
+        <div class="alerts-card">
+            <div class="card-header">
+                <h2>🚨 Security Alerts</h2>
+                <p>Fraud SMS reports from all monitored devices</p>
+            </div>
+            <div class="alerts-body">
+                <div class="table-container">
+                    <table class="alerts-table" id="alertsTable">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Sender</th>
+                                <th>Message</th>
+                                <th>Confidence</th>
+                                <th>Risk</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alertsBody">
+                            <tr class="empty-row">
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <span class="empty-icon">✅</span>
+                                        <p>No alerts yet — system is monitoring</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blocked Messages -->
+        <div class="blocked-card dashboard-blocked">
+            <div class="card-header">
+                <h2>🚫 Blocked Messages Log</h2>
+                <p>All messages blocked across devices</p>
+            </div>
+            <div class="blocked-body">
+                <div class="table-container">
+                    <table class="alerts-table" id="blockedTable">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Sender</th>
+                                <th>Message</th>
+                                <th>Confidence</th>
+                                <th>Risk</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="blockedBody">
+                            <tr class="empty-row">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <span class="empty-icon">🛡️</span>
+                                        <p>No blocked messages yet</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>SMS Fraud Guard — Security Team Dashboard | Real-time Fraud Monitoring</p>
+    </footer>
+
+    <script>
+        // Auto-refresh interval
+        const REFRESH_INTERVAL = 5000;
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const stats = await res.json();
+                document.getElementById('totalScanned').textContent = stats.total_scanned;
+                document.getElementById('fraudDetected').textContent = stats.fraud_detected;
+                document.getElementById('blockedCount').textContent = stats.blocked_count;
+                document.getElementById('pendingAlerts').textContent = stats.pending_alerts;
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+
+        async function loadAlerts() {
+            try {
+                const res = await fetch('/api/alerts');
+                const alerts = await res.json();
+                const tbody = document.getElementById('alertsBody');
+
+                if (alerts.length === 0) {
+                    tbody.innerHTML = `
+                        <tr class="empty-row">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <span class="empty-icon">✅</span>
+                                    <p>No alerts yet — system is monitoring</p>
+                                </div>
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = alerts.map(alert => `
+                    <tr class="${alert.is_reviewed ? '' : 'unreviewed'}">
+                        <td class="time-cell">${formatTime(alert.notified_at)}</td>
+                        <td class="sender-cell">${escapeHtml(alert.sender || 'Unknown')}</td>
+                        <td class="message-cell">${escapeHtml(alert.message.substring(0, 80))}${alert.message.length > 80 ? '...' : ''}</td>
+                        <td><span class="confidence-badge">${alert.confidence.toFixed(1)}%</span></td>
+                        <td><span class="risk-badge risk-${alert.risk_level}">${alert.risk_level.toUpperCase()}</span></td>
+                        <td><span class="status-badge ${alert.is_reviewed ? 'reviewed' : 'pending'}">${alert.is_reviewed ? 'Reviewed' : 'Pending'}</span></td>
+                        <td>${!alert.is_reviewed ? `<button class="btn btn-sm btn-review" onclick="reviewAlert(${alert.id})">✓ Review</button>` : '<span class="done">Done</span>'}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load alerts:', e);
+            }
+        }
+
+        async function loadBlocked() {
+            try {
+                const res = await fetch('/api/blocked');
+                const messages = await res.json();
+                const tbody = document.getElementById('blockedBody');
+
+                if (messages.length === 0) {
+                    tbody.innerHTML = `
+                        <tr class="empty-row">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <span class="empty-icon">🛡️</span>
+                                    <p>No blocked messages yet</p>
+                                </div>
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = messages.map(msg => `
+                    <tr>
+                        <td class="time-cell">${formatTime(msg.blocked_at)}</td>
+                        <td class="sender-cell">${escapeHtml(msg.sender || 'Unknown')}</td>
+                        <td class="message-cell">${escapeHtml(msg.message.substring(0, 80))}${msg.message.length > 80 ? '...' : ''}</td>
+                        <td><span class="confidence-badge">${msg.confidence.toFixed(1)}%</span></td>
+                        <td><span class="risk-badge risk-${msg.risk_level}">${msg.risk_level.toUpperCase()}</span></td>
+                        <td><button class="btn btn-sm btn-unblock" onclick="unblockMsg(${msg.id})">Unblock</button></td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to load blocked:', e);
+            }
+        }
+
+        async function reviewAlert(id) {
+            await fetch(`/api/alerts/${id}/review`, { method: 'POST' });
+            loadAlerts();
+            loadStats();
+        }
+
+        async function unblockMsg(id) {
+            await fetch(`/api/unblock/${id}`, { method: 'POST' });
+            loadBlocked();
+            loadStats();
+        }
+
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return d.toLocaleString('en-IN', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Initial load
+        loadStats();
+        loadAlerts();
+        loadBlocked();
+
+        // Auto-refresh
+        setInterval(() => {
+            loadStats();
+            loadAlerts();
+            loadBlocked();
+        }, REFRESH_INTERVAL);
+    </script>
+</body>
+</html>

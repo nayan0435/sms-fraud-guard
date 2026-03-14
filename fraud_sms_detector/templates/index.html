@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMS Fraud Guard - Protect Your Messages</title>
+    <meta name="description" content="AI-powered SMS fraud detection system that automatically blocks spam and fraud messages">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🛡️</div>
+                <div>
+                    <h1>SMS Fraud Guard</h1>
+                    <span class="tagline">AI-Powered SMS Protection</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="auto-block-toggle">
+                    <span class="toggle-label">Auto-Block</span>
+                    <label class="switch" id="autoBlockSwitch">
+                        <input type="checkbox" id="autoBlockToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <a href="/dashboard" class="btn btn-outline">🔒 Security Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon scan-icon">📱</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="totalScanned">0</span>
+                    <span class="stat-label">Total Scanned</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon fraud-icon">🚨</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="fraudDetected">0</span>
+                    <span class="stat-label">Fraud Detected</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon block-icon">🚫</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="blockedCount">0</span>
+                    <span class="stat-label">Messages Blocked</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rate-icon">📊</div>
+                <div class="stat-info">
+                    <span class="stat-value" id="fraudRate">0%</span>
+                    <span class="stat-label">Fraud Rate</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- SMS Scanner -->
+        <div class="scanner-card">
+            <div class="card-header">
+                <h2>📨 SMS Scanner</h2>
+                <p>Paste or type an SMS message to check if it's fraud</p>
+            </div>
+            <div class="scanner-body">
+                <div class="input-group">
+                    <label for="senderInput">Sender Number</label>
+                    <input type="text" id="senderInput" placeholder="+91 9876543210" class="input-field">
+                </div>
+                <div class="input-group">
+                    <label for="messageInput">SMS Message</label>
+                    <textarea id="messageInput" rows="4" placeholder="Paste the SMS message here..." class="input-field"></textarea>
+                </div>
+                <button id="scanBtn" class="btn btn-primary btn-scan" onclick="scanMessage()">
+                    <span class="btn-text">🔍 Scan Message</span>
+                    <span class="btn-loading" style="display:none">⏳ Analyzing...</span>
+                </button>
+            </div>
+
+            <!-- Result Panel -->
+            <div id="resultPanel" class="result-panel" style="display:none">
+                <div id="resultContent"></div>
+            </div>
+        </div>
+
+        <!-- Blocked Messages -->
+        <div class="blocked-card">
+            <div class="card-header">
+                <h2>🚫 Blocked Messages</h2>
+                <p>Messages automatically blocked by the fraud detector</p>
+            </div>
+            <div class="blocked-body">
+                <div id="blockedList" class="blocked-list">
+                    <div class="empty-state">
+                        <span class="empty-icon">✅</span>
+                        <p>No blocked messages yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Sample Messages -->
+    <section class="samples-section">
+        <h3>🧪 Try Sample Messages</h3>
+        <div class="samples-grid">
+            <button class="sample-btn fraud-sample" onclick="loadSample('fraud1')">
+                <span class="sample-type">🚨 Fraud</span>
+                <span class="sample-text">Prize scam message</span>
+            </button>
+            <button class="sample-btn fraud-sample" onclick="loadSample('fraud2')">
+                <span class="sample-type">🚨 Fraud</span>
+                <span class="sample-text">Bank phishing alert</span>
+            </button>
+            <button class="sample-btn safe-sample" onclick="loadSample('safe1')">
+                <span class="sample-type">✅ Safe</span>
+                <span class="sample-text">Friend's message</span>
+            </button>
+            <button class="sample-btn safe-sample" onclick="loadSample('safe2')">
+                <span class="sample-type">✅ Safe</span>
+                <span class="sample-text">Work message</span>
+            </button>
+            <button class="sample-btn fraud-sample" onclick="loadSample('fraud3')">
+                <span class="sample-type">🚨 Fraud</span>
+                <span class="sample-text">Package delivery scam</span>
+            </button>
+            <button class="sample-btn safe-sample" onclick="loadSample('safe3')">
+                <span class="sample-type">✅ Safe</span>
+                <span class="sample-text">Family message</span>
+            </button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>SMS Fraud Guard — AI-Powered Protection | Built with ❤️ using Machine Learning</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
