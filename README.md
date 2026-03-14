@@ -1,4 +1,4 @@
-# 🛡️ SMS Fraud Guard — AI-Powered SMS Fraud Detection & Auto-Block System
+#  SMS Fraud Guard — AI-Powered SMS Fraud Detection & Auto-Block System
 
 A complete **machine learning-based SMS fraud detection system** with a web dashboard and a native Android app that automatically intercepts, classifies, and blocks fraudulent SMS messages in real-time.
 
@@ -9,7 +9,7 @@ A complete **machine learning-based SMS fraud detection system** with a web dash
 
 ---
 
-## 🚀 Features
+## Features
 
 - **AI-Powered Detection** — TF-IDF + Naive Bayes classifier trained on 5,574+ SMS messages
 - **Real-Time Scanning** — Classify any SMS as fraud or safe with confidence score
@@ -17,8 +17,6 @@ A complete **machine learning-based SMS fraud detection system** with a web dash
 - **Push Notifications** — Instant alerts when fraud SMS is detected on your phone
 - **Security Team Dashboard** — Live monitoring portal with alerts, stats, and blocked message logs
 - **Android App** — Native Kotlin app with SMS interception via BroadcastReceiver
-
----
 
 
 
@@ -63,6 +61,39 @@ A complete **machine learning-based SMS fraud detection system** with a web dash
             └── SettingsActivity.kt
 ```
 
+---
+
+## ⚡ Quick Start
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/YOUR_USERNAME/sms-fraud-guard.git
+cd sms-fraud-guard
+```
+
+### 2. Install dependencies
+```bash
+cd fraud_sms_detector
+pip install -r requirements.txt
+```
+
+### 3. Train the ML model
+```bash
+cd model
+python train_model.py
+```
+
+### 4. Start the server
+```bash
+cd ..
+python app.py
+```
+
+### 5. Open in browser
+- **User Dashboard:** http://localhost:5000/
+- **Security Dashboard:** http://localhost:5000/dashboard
+
+---
 
 ## 📱 Android App Setup
 
@@ -121,4 +152,6 @@ This project is open-source and available under the [MIT License](LICENSE).
 
 Contributions are welcome! Feel free to open issues or submit pull requests.
 
+---
 
+Made with ❤️ using Machine Learning
